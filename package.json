@@ -1,0 +1,21 @@
+{
+  "name": "SourceScript",
+  "description": "A higher-level scripting language for Valve's games that allow scripting.",
+  "version": "0.0.1",
+  "maintainers": [
+    {
+      "name": "Philipp Schroer",
+      "email": "mail@philworld.de",
+      "web": "http://philippschröer.de/"
+    }
+  ],
+  "dependencies": {
+    "pegjs": ">= 0.7.0",
+    "underscore": ">= 1.3.3",
+    "mkdirp": ">= 0.3.0"
+  },
+  "devDependencies": {
+    "coffee-script": ">= 1.2.0",
+    "wrench": ">= 1.3.9"
+  }
+}
