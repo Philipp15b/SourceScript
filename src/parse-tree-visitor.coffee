@@ -36,5 +36,8 @@ module.exports = class ParseTreeVisitor
   visitCondition: (condition) ->
     
   visitCommand: (command) ->
-
+    for arg in command.args
+      if arg.type?
+        @visitBlock arg
+  
   visitComment: (comment) ->

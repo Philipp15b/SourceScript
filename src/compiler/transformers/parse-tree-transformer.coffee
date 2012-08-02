@@ -36,7 +36,10 @@ module.exports = class ParseTreeTransformer
   transformCondition: (condition) ->
 
   transformCommand: (command) ->
+    for arg in command.args
+      if arg.type?
+        @transformBlock arg
     command
 
   transformComment: (comment) ->
-
+    comment

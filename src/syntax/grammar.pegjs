@@ -81,6 +81,7 @@ Command
   
 CommandArgument
   = '"' content:(!'"' .)* '"' { return helpers.every(1, content).join(""); }
+  / Block
   
 Comment
   = '#' content:(!EndOfLine .)* 

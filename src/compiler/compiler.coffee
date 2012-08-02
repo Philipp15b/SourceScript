@@ -70,7 +70,12 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeNodeInfo command
     @write command.name
     for arg in command.args
-      @write " \"#{arg}\""
+      if arg.type?
+        @write " \""
+        @visitBlockInline arg
+        @write "\""
+      else
+        @write " \"#{arg}\""
     @writeln ';'
     
   visitComment: (comment) ->
