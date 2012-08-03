@@ -24,6 +24,9 @@ module.exports = class ParseTreeVisitor
   visitFunctionDeclaration: (declaration) ->
     @visitBlock declaration.body
     
+  visitEnumerationDeclaration: (declaration) ->
+    @visitList declaration.content
+    
   visitFunctionCall: (call) ->
   
   visitIfStatement: (ifStatement) ->

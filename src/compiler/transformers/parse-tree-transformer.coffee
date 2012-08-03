@@ -22,6 +22,9 @@ module.exports = class ParseTreeTransformer
     @transformBlock declaration.body
     declaration
 
+  transformEnumerationDeclaration: (declaration) ->
+    @transformList declaration.content
+
   transformFunctionCall: (call) ->
     call
 

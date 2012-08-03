@@ -29,6 +29,8 @@ module.exports = createNodes Node,
 
   FunctionDeclaration: ['name', 'body']
   FunctionCall: ['name']
+  
+  EnumerationDeclaration: ['name', 'content']
 
   IfStatement: ['condition', 'if', 'else']
   Condition: ['condition', 'isNegated']
