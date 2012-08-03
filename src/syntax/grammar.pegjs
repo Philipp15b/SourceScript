@@ -88,8 +88,8 @@ Condition
      { return new n.Condition(condition, negated != "").p(line, column); }
 
 Command
-  = name:Identifier __ args:(CommandArgument _)*
-     { return new n.Command(name, helpers.every(0, args)).p(line, column); }
+  = name:Identifier args:(__ (CommandArgument _)*)?
+     { return new n.Command(name, helpers.every(0, args[1])).p(line, column); }
 
 CommandArgument
   = '"' content:(!'"' .)* '"' { return helpers.every(1, content).join(""); }
