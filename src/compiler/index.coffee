@@ -1,5 +1,5 @@
 Compiler = require './compiler'
-Simplifier = require './transformers/simplifier'
+Simplifier = require './simplifier'
 
 module.exports = compile = (ast, debug = off) ->
   compiler = new Compiler debug
