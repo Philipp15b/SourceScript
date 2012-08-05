@@ -1,4 +1,4 @@
-ParseTreeTransformer = require './parse-tree-transformer'
+ParseTreeTransformer = require '../parse-tree-transformer'
 
 module.exports = class Simplifier extends ParseTreeTransformer
 
