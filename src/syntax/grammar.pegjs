@@ -24,7 +24,7 @@ Outdent
   = "Outdent" __
 
 Identifier "Identfier"
-  = name:[a-zA-Z0-9]+
+  = name:[a-zA-Z0-9+]+
      { return name.join(""); }
 
 EndOfLine
