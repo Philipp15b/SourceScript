@@ -27,7 +27,7 @@ Identifier "Identfier"
   = name:[a-zA-Z0-9+]+
      { return name.join(""); }
 
-EndOfLine
+EndOfLine "End of Line"
   = '\n'
   / "\r\n"
   / "\r"
@@ -37,7 +37,7 @@ BooleanLiteral
   / "false" { return false; }
 
 Program
-  = program:(Statement StatementSeperator)*
+  = program:(Statement StatementSeperator)* StatementSeperator*
     { return new n.Block(helpers.every(0, program)).p(line, column); }
 
 StatementSeperator
@@ -57,15 +57,15 @@ Statement
   / Command
   / Comment
 
-VariableAssignment
+VariableAssignment "Variable Assignment"
   = name:Identifier _ "=" _ expr:BooleanLiteral
     { return new n.VariableAssignment(name, expr).p(line, column); }
 
-FunctionDeclaration
+FunctionDeclaration "Function Declaration"
   = "function" __ name:Identifier _ "()" _ expr:Block
     { return new n.FunctionDeclaration(name, expr).p(line, column); }
 
-EnumerationDeclaration
+EnumerationDeclaration "Enumeration Declaration"
   = "enum" __ name:Identifier _ '{' _EOL content:BlockList _EOL '}'
     { return new n.EnumerationDeclaration(name, content).p(line, column); }
 
@@ -73,11 +73,11 @@ BlockList
   = head:Block tail:(',' _EOL Block)*
     { return [head].concat(helpers.every(2, tail)); }
 
-FunctionCall
+FunctionCall "Function Call"
   = name:Identifier _ "()"
      { return new n.FunctionCall(name).p(line, column); }
 
-IfStatement
+IfStatement "Conditional Statement"
   = "if" __ condition:Condition _ yes:Block _ "else" _ no:Block
      { return new n.IfStatement(condition, yes, no).p(line, column); }
   / "if" __ condition:Condition _ yes:Block
@@ -87,7 +87,7 @@ Condition
   = negated:'!'? _ condition:Identifier
      { return new n.Condition(condition, negated != "").p(line, column); }
 
-Command
+Command "Command"
   = name:Identifier args:(__ (CommandArgument _)*)?
      { return new n.Command(name, helpers.every(0, args[1])).p(line, column); }
 
@@ -96,6 +96,6 @@ CommandArgument
   / content:(!(ws / EndOfLine / '{') .)+ { return helpers.every(1, content).join(""); }
   / Block
 
-Comment
+Comment "Comment"
   = '#' content:(!EndOfLine .)*
      { return new n.Comment(helpers.every(1, content).join("")); }
