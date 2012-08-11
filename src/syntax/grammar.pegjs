@@ -93,6 +93,7 @@ Command
 
 CommandArgument
   = '"' content:(!'"' .)* '"' { return helpers.every(1, content).join(""); }
+  / content:(!(ws / EndOfLine / '{') .)+ { return helpers.every(1, content).join(""); }
   / Block
 
 Comment
