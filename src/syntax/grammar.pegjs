@@ -6,8 +6,8 @@
 start
   = Program
 
-ws
-  = " "
+ws "Whitespace"
+   = [\t\v\f \u00A0\uFEFF]
 _
   = ws*
 
