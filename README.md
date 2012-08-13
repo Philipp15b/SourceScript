@@ -91,22 +91,19 @@ Let's just see what that compiles to:
 ### Functions
 
 SourceScript also introduces an easy syntax for functions.
-Essentially, they are just aliases with the prefix `function_` before their name.
+They can be used to prevent code duplication.
 
     function do() {
        +attack
        -attack
     }
+    
+    alias "doit" {
+      do();
+    }
 
-This produces almost the same thing as above, just with the `function_` prefix:
+This will be compiled into:
 
-    alias function_do "+attack; -attack; ";
-
-This is useful for procedures that are intended to be used only by your script,
-not the user via the console.
-
-To call functions, just write the function name and then opening and closing braces:
-
-    do();
-
-This will call the alias `function_do`.
+   alias "doit" "+attack; -attack; "
+  
+As you can see, the function call will be replaced by the function code.

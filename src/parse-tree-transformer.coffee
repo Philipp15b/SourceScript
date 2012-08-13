@@ -1,7 +1,10 @@
 module.exports = class ParseTreeTransformer
   transformAny: (tree) ->
     throw new Error("No tree given!") if !tree? or tree == undefined
-    @["transform#{tree.type}"](tree)
+    if tree isnt undefined
+      @["transform#{tree.type}"](tree)
+    else
+      undefined
 
   transform: (tree) ->
     @transformAny tree
