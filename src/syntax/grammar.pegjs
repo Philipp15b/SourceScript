@@ -45,8 +45,7 @@ Program
     { return new n.Block(helpers.every(0, program)).p(line, column); }
 
 StatementSeperator
-  = (_ EndOfLine _)+
-  / (_ ';' _)+
+  = ( _ (EndOfLine / ';') _ )+
 
 Block
   = _ "{" _ EndOfLine* _ program:Program _ "}"
