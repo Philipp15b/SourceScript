@@ -24,7 +24,11 @@ Outdent
   = "Outdent" __
 
 Identifier "Identfier"
-  = name:[a-zA-Z0-9+]+
+  = name:[a-zA-Z0-9+-]+
+     { return name.join(""); }
+     
+FunctionIdentifier "Function Identifier"
+  = name:[a-zA-Z0-9+-:]+
      { return name.join(""); }
 
 EndOfLine "End of Line"
@@ -62,7 +66,7 @@ VariableAssignment "Variable Assignment"
     { return new n.VariableAssignment(name, expr).p(line, column); }
 
 FunctionDeclaration "Function Declaration"
-  = "function" __ name:Identifier _ "()" _ expr:Block
+  = "function" __ name:FunctionIdentifier _ "()" _ expr:Block
     { return new n.FunctionDeclaration(name, expr).p(line, column); }
 
 EnumerationDeclaration "Enumeration Declaration"
@@ -74,7 +78,7 @@ BlockList
     { return [head].concat(helpers.every(2, tail)); }
 
 FunctionCall "Function Call"
-  = name:Identifier _ "()"
+  = name:FunctionIdentifier _ "()"
      { return new n.FunctionCall(name).p(line, column); }
 
 IfStatement "Conditional Statement"
