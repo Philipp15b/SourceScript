@@ -104,6 +104,6 @@ They can be used to prevent code duplication.
 
 This will be compiled into:
 
-   alias "doit" "+attack; -attack; "
+    alias "doit" "+attack; -attack; "
   
 As you can see, the function call will be replaced by the function code.
