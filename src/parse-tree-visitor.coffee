@@ -8,8 +8,7 @@
 module.exports = class ParseTreeVisitor
   visitAny: (tree) ->
     throw new Error("No tree given!") if !tree? or tree == undefined
-    if tree isnt undefined
-      @["visit#{tree.type}"](tree)
+    @["visit#{tree.type}"](tree)
 
   visit: (tree) ->
     @visitAny tree
