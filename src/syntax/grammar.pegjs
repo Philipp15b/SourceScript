@@ -41,7 +41,7 @@ BooleanLiteral
   / "false" { return false; }
 
 Program
-  = program:(Statement StatementSeperator)* StatementSeperator*
+  = program:(Statement StatementSeperator)* StatementSeperator?
     { return new n.Block(helpers.every(0, program)).p(line, column); }
 
 StatementSeperator
@@ -80,7 +80,7 @@ FunctionCall "Function Call"
   = name:FunctionIdentifier _ "()"
      { return new n.FunctionCall(name).p(line, column); }
 
-IfStatement "Conditional Statement"
+IfStatement "If Statement"
   = "if" __ condition:Condition _ yes:Block _ "else" _ no:Block
      { return new n.IfStatement(condition, yes, no).p(line, column); }
   / "if" __ condition:Condition _ yes:Block
