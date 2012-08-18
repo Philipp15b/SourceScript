@@ -76,7 +76,7 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeAlias "FalseHook", ifStatement.else
 
     condition = ifStatement.condition
-    @writeln "var_ #{condition.id}_#{condition.condition};"
+    @writeln "var_#{condition.id}_#{condition.condition};"
 
   visitCommand: (command) ->
     @writeNodeInfo command
