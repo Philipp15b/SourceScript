@@ -27,7 +27,7 @@ class VariableCollector extends ParseTreeVisitor
 # Assigns variable declarations to the parent block of the
 # declaration.
 module.exports.collectVariableDeclarations = (ast) ->
-  collector = new FunctionCollector
+  collector = new VariableCollector
   collector.visit ast
   ast
 
