@@ -12,8 +12,8 @@ class VariableCollector extends ParseTreeVisitor
       getVariableDeclaration block.parent, name
     else
       null
-
-  variableIndex: 0
+      
+  constructor: (@variableIndex) ->
 
   visitVariableAssignment: (assignment) ->
     declaration = getVariableDeclaration(assignment.parent, assignment.name)
@@ -32,10 +32,11 @@ class VariableCollector extends ParseTreeVisitor
 
 # Assigns variable declarations to the parent block of the
 # declaration.
-module.exports.collectVariableDeclarations = (ast) ->
-  collector = new VariableCollector
+# Returns the current variable index.
+module.exports.collectVariableDeclarations = (ast, variableIndex = 0) ->
+  collector = new VariableCollector variableIndex
   collector.visit ast
-  ast
+  collector.variableIndex
 
 
 # Functions

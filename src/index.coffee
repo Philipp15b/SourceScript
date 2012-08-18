@@ -18,8 +18,10 @@ compile = (files) ->
 
   # Semantics
   fileMetadata = {}
+  variableIndex = 0
   for filename, ast of parsedFiles
-    fileMetadata[filename] = analyzeSemantics ast
+    fileMetadata[filename] = analyzeSemantics ast, variableIndex
+    {variableIndex} = fileMetadata[filename]
   
   validateDependencies files, fileMetadata
 

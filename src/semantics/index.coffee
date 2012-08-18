@@ -21,13 +21,14 @@ class ParentBlockPropertyAssigner extends ParseTreeVisitor
 # Analyzes the given AST, sets variable declarations in their parent blocks
 # and returns an object of metadata of Function Declarations and 
 # dependencies for the given AST
-module.exports = (ast) ->
+module.exports = (ast, variableIndex = 0) ->
   pbpa = new ParentBlockPropertyAssigner
   pbpa.visit ast
   
-  collectVariableDeclarations ast
+  variableIndex = collectVariableDeclarations ast, variableIndex
   
   {
     functionDeclarations: getFunctionDeclarations ast
     dependencies: getDependencies ast
+    variableIndex: variableIndex
   }
