@@ -27,6 +27,10 @@ Identifier "Identfier"
   = name:[a-zA-Z0-9+-]+
      { return name.join(""); }
      
+VariableIdentifier "Variable Identfier"
+  = head:'$'? tail:[a-zA-Z0-9+-]+
+     { return head + tail.join(""); }
+     
 FunctionIdentifier "Function Identifier"
   = name:[a-zA-Z0-9+-:]+
      { return name.join(""); }
@@ -61,7 +65,7 @@ Statement
   / Comment
 
 VariableAssignment "Variable Assignment"
-  = name:Identifier _ "=" _ expr:BooleanLiteral
+  = name:VariableIdentifier _ "=" _ expr:BooleanLiteral
     { return new n.VariableAssignment(name, expr).p(line, column); }
 
 FunctionDeclaration "Function Declaration"
@@ -87,7 +91,7 @@ IfStatement "If Statement"
      { return new n.IfStatement(condition, yes).p(line, column); }
 
 Condition
-  = negated:'!'? _ condition:Identifier
+  = negated:'!'? _ condition:VariableIdentifier
      { return new n.Condition(condition, negated != "").p(line, column); }
 
 Command "Command"

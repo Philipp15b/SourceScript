@@ -16,6 +16,12 @@ class VariableCollector extends ParseTreeVisitor
   constructor: (@variableIndex) ->
 
   visitVariableAssignment: (assignment) ->
+    # Only mark global variables
+    if assignment.name.charAt(0) is '$'
+      assignment.name = assignment.name.substr 1
+      assignment.id = ""
+      return
+
     declaration = getVariableDeclaration(assignment.parent, assignment.name)
     unless declaration?
       declaration = new VariableDeclaration(assignment.name, @variableIndex++)
@@ -25,10 +31,15 @@ class VariableCollector extends ParseTreeVisitor
     assignment.id = declaration.id
     
   visitIfStatement: (ifStatement) ->
-    conditionDeclaration = getVariableDeclaration ifStatement.parent, ifStatement.condition.condition
-    unless conditionDeclaration?
-      throw new Error "Variable #{ifStatement.condition.condition} is not declared in line #{ifStatement.line}, column #{ifStatement.column}"
-    ifStatement.condition.id = conditionDeclaration.id
+    condition = ifStatement.condition
+    if condition.condition.charAt(0) is '$'
+      condition.condition = condition.condition.substr 1
+      condition.id = ""
+    else
+      conditionDeclaration = getVariableDeclaration ifStatement.parent, condition.condition
+      unless conditionDeclaration?
+        throw new Error "Variable #{condition.condition} is not declared in line #{ifStatement.line}, column #{ifStatement.column}"
+      condition.id = conditionDeclaration.id
 
 # Assigns variable declarations to the parent block of the
 # declaration.
