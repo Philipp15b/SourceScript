@@ -82,7 +82,7 @@ So when `nextweapon` is called, it will first execute the first command, `slot2`
 After that, it will assign the next command to `nextweapon` and so on.
 
 Let's just see what that compiles to:
-   
+
     alias nextweapon "nextweapon_0";
     alias nextweapon_0 "slot2; alias nextweapon "nextweapon_1"";
     alias nextweapon_1 "slot3; alias nextweapon "nextweapon_2"";
@@ -90,20 +90,33 @@ Let's just see what that compiles to:
 
 ### Functions
 
-SourceScript also introduces an easy syntax for functions.
-They can be used to prevent code duplication.
+Functions are a way to remove code duplication by
+defining functions that do the work. The function call
+is replaced by the function code when compiling.
 
-    function do() {
-       +attack
-       -attack
-    }
-    
-    alias "doit" {
-      do();
-    }
+Also, unused functions are not going to be compiled into
+the final code, which means that it is really handy to define
+a huge library of functions, which you can then use in your binds.
 
-This will be compiled into:
+     function +Pyro::Panic() {
+        battlecry
+        cl_yawspeed 3000
+        +left
+        +attack
+     }
 
-    alias "doit" "+attack; -attack; "
-  
-As you can see, the function call will be replaced by the function code.
+     function -Pyro::Panic() {
+         -attack
+         -left
+         cl_yawspeed 210
+     }
+
+This piece of code defines two functions with the names
+`+Pyro::Panic()` and `-Pyro::Panic()`. Then you can just call
+the functions like this:
+
+      +Pyro::Panic()
+      -Pyro::Panic()
+
+**Warning:** Dont use `bind "MOUSE4" "Pyro::Panic()"`, because the function call is
+not going to be replaced when you use quotation marks in arguments.

@@ -41,10 +41,6 @@ module.exports = class Compiler extends ParseTreeVisitor
 
     unless inlineBefore
       @inline = false
-      
-  visit: (tree) ->
-    {@functionDeclarations} = tree
-    super tree
 
   # Actual node type handlers
   visitVariableAssignment: (assignment) ->
@@ -73,14 +69,6 @@ module.exports = class Compiler extends ParseTreeVisitor
     @visitBlockInline declaration.content.slice(-1)[0]
     @write "alias #{name} \"#{name}_0\""  # set enum function to first item
     @writeln "\";"
-
-  visitFunctionCall: (call) ->
-    @writeNodeInfo call
-    declaration = @functionDeclarations[call.name]
-    unless declaration?
-      throw new Error "Could not find function #{call.name}"
-    @visitBlock declaration.body
-    @visit declaration
 
   visitIfStatement: (ifStatement) ->
     @writeNodeInfo ifStatement

@@ -1,5 +1,6 @@
 ParseTreeVisitor = require '../parse-tree-visitor'
-VariableCollector = require './variable-collector'
+{getFunctionDeclarations, collectVariableDeclarations} = require './declarations'
+getDependencies = require './dependencies'
 
 # Sets the parent property of every node to the parent block.
 class ParentBlockPropertyAssigner extends ParseTreeVisitor
@@ -17,9 +18,16 @@ class ParentBlockPropertyAssigner extends ParseTreeVisitor
     @block = block
     super(block)
 
-# Adds semantics to an AST by running all the visitors
-# on the tree.
+# Analyzes the given AST, sets variable declarations in their parent blocks
+# and returns an object of metadata of Function Declarations and 
+# dependencies for the given AST
 module.exports = (ast) ->
-  for visitor in [new ParentBlockPropertyAssigner, new VariableCollector]
-    visitor.visitAny ast
-  ast
+  pbpa = new ParentBlockPropertyAssigner
+  pbpa.visit ast
+  
+  collectVariableDeclarations ast
+  
+  {
+    functionDeclarations: getFunctionDeclarations ast
+    dependencies: getDependencies ast
+  }

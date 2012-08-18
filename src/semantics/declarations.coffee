@@ -1,9 +1,10 @@
 ParseTreeVisitor = require '../parse-tree-visitor'
 
+# Variables
 class VariableDeclaration
   constructor: (@name, @id) ->
 
-module.exports = class VariableCollector extends ParseTreeVisitor
+class VariableCollector extends ParseTreeVisitor
   getVariableDeclaration = (block, name) ->
     if block.variableDeclarations?
       return declaration for declaration in block.variableDeclarations when declaration.name is name
@@ -22,3 +23,25 @@ module.exports = class VariableCollector extends ParseTreeVisitor
       assignment.parent.variableDeclarations.push declaration
 
     assignment.id = declaration.id
+
+# Assigns variable declarations to the parent block of the
+# declaration.
+module.exports.collectVariableDeclarations = (ast) ->
+  collector = new FunctionCollector
+  collector.visit ast
+  ast
+
+
+# Functions
+class FunctionCollector extends ParseTreeVisitor
+  functionDeclarations: {}
+
+  visitFunctionDeclaration: (declaration) ->
+    @functionDeclarations[declaration.name] = declaration
+
+# Returns an object of the function declarations in the
+# given AST.
+module.exports.getFunctionDeclarations = (ast) ->
+  collector = new FunctionCollector
+  collector.visit ast
+  collector.functionDeclarations
