@@ -23,6 +23,12 @@ class VariableCollector extends ParseTreeVisitor
       assignment.parent.variableDeclarations.push declaration
 
     assignment.id = declaration.id
+    
+  visitIfStatement: (ifStatement) ->
+    conditionDeclaration = getVariableDeclaration ifStatement.parent, ifStatement.condition.condition
+    unless conditionDeclaration?
+      throw new Error "Variable #{ifStatement.condition.condition} is not declared in line #{ifStatement.line}, column #{ifStatement.column}"
+    ifStatement.condition.id = conditionDeclaration.id
 
 # Assigns variable declarations to the parent block of the
 # declaration.
