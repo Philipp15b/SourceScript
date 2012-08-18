@@ -1,32 +1,32 @@
 module.exports = class ParseTreeTransformer
   transformAny: (tree) ->
     throw new Error("No tree given!") if !tree? or tree == undefined
-    if tree isnt undefined
-      @["transform#{tree.type}"](tree)
-    else
-      undefined
+    @["transform#{tree.type}"](tree)
 
   transform: (tree) ->
     @transformAny tree
-    tree
 
   transformList: (list) ->
-    @transformAny item for item in list
-    list
+    newlist = []
+    for item in list
+      if (newitem = @transformAny item)?
+        newlist.push newitem
+    newlist
 
   transformBlock: (block) ->
-    @transformList block.statements
+    block.statements = @transformList block.statements
     block
 
   transformVariableAssignment: (assignment) ->
     assignment
 
   transformFunctionDeclaration: (declaration) ->
-    @transformBlock declaration.body
+    declaration.body = @transformBlock declaration.body
     declaration
 
   transformEnumerationDeclaration: (declaration) ->
-    @transformList declaration.content
+    declaration.content = @transformList declaration.content
+    declaration
 
   transformFunctionCall: (call) ->
     call
@@ -34,17 +34,18 @@ module.exports = class ParseTreeTransformer
   transformIfStatement: (ifStatement) ->
     @transformCondition ifStatement.condition
     if ifStatement.if?
-      @transformBlock ifStatement.if
+      ifStatement.if = @transformBlock ifStatement.if
     if ifStatement.else?
-      @transformBlock ifStatement.else
+      ifStatement.else = @transformBlock ifStatement.else
     ifStatement
 
   transformCondition: (condition) ->
+    condition
 
   transformCommand: (command) ->
-    for arg in command.args
+    for arg, i in command.args
       if arg.type?
-        @transformBlock arg
+        command.args[i] = @transformBlock arg
     command
 
   transformComment: (comment) ->
