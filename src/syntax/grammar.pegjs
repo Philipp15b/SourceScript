@@ -24,15 +24,15 @@ Outdent
   = "Outdent" __
 
 Identifier "Identfier"
-  = name:[a-zA-Z0-9+-]+
+  = name:([a-zA-Z0-9+-] / '_')+
      { return name.join(""); }
      
 VariableIdentifier "Variable Identfier"
-  = head:'$'? tail:[a-zA-Z0-9+-]+
+  = head:'$'? tail:([a-zA-Z0-9+-] / '_')+
      { return head + tail.join(""); }
      
 FunctionIdentifier "Function Identifier"
-  = name:[a-zA-Z0-9+-:]+
+  = name:([a-zA-Z0-9+-:] / '_')+
      { return name.join(""); }
 
 EndOfLine "End of Line"
