@@ -1,4 +1,5 @@
 node_modules
 bin
 lib
-src/syntax/grammar-parser.js
+browser.js
+browser.min.js

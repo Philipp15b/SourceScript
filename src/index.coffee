@@ -2,8 +2,6 @@ syntax = require './syntax'
 semantics = require './semantics'
 compiler = require './compiler'
 
-module.exports.buildParser = syntax.buildParser
-
 # Parses and analyzes the given code.
 #
 # @param code The code

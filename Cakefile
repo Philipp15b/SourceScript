@@ -1,20 +1,46 @@
 {exec} = require 'child_process'
 {readFileSync, existsSync, writeFileSync, unlinkSync} = require 'fs'
-{mkdirSyncRecursive, rmdirSyncRecursive} = require 'wrench'
+{rmdirSyncRecursive} = require 'wrench'
+mkdirSync = require('mkdirp').sync
+PEG = require 'pegjs'
+uglify = require 'uglify-js'
+
 
 task 'clean', 'clean up the build path', ->
-  parser = "#{__dirname}/src/syntax/grammar-parser.js"
-  unlinkSync parser if existsSync parser
+  unlinkSync file for file in ['browser.js', 'browser.min.js'] when existsSync file
   rmdirSyncRecursive dir for dir in ['lib', 'bin'] when existsSync dir
 
 task 'build', 'build SourceScript from source', ->
-  mkdirSyncRecursive 'lib/syntax/'
-  writeFileSync 'lib/syntax/grammar.pegjs', readFileSync('src/syntax/grammar.pegjs').toString()
+  invoke 'clean'
+
   exec 'coffee --compile --output lib/ src/', (err, stdout, stderr) ->
     throw err if err
     console.log stdout + stderr
     invoke 'build:parser'
 
-task 'build:parser', 'rebuild the peg.js parser', ->
-  syntax = require './lib/syntax'
-  syntax.buildParser()
+task 'build:parser', 'build the peg.js parser', ->
+  grammar = readFileSync('src/syntax/grammar.pegjs').toString()
+  parser = PEG.buildParser grammar,
+    trackLineAndColumn: on
+
+  mkdirSync "./lib/syntax/" unless existsSync './lib/syntax'
+  writeFileSync "./lib/syntax/grammar-parser.js", "module.exports = #{parser.toSource()}"
+
+# -----------------
+# BROWSERIFY
+# -----------------
+
+task 'browserify', 'build for browserify', ->
+  browserify = require 'browserify'
+  {bundle} = browserify './lib/index.js'
+  writeFileSync 'browser.js', bundle()
+
+  invoke 'browserify:minify'
+
+task 'browserify:minify', 'minify the browserified file', ->
+  original = readFileSync('./browser.js').toString()
+  ast = uglify.parser.parse original
+  ast =  uglify.uglify.ast_mangle ast
+  ast = uglify.uglify.ast_squeeze ast
+  code = uglify.uglify.gen_code ast
+  writeFileSync './browser.min.js', code
