@@ -96,7 +96,7 @@ Condition
 
 Command "Command"
   = name:Identifier args:(__ (CommandArgument _)*)?
-     { return new n.Command(name, helpers.every(0, args[1])).p(line, column); }
+     { return new n.Command(name, args == "" ? [] : helpers.every(0, args[1])).p(line, column); }
 
 CommandArgument
   = '"' content:(!'"' .)* '"' { return helpers.every(1, content).join(""); }
