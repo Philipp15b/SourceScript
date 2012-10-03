@@ -31,6 +31,7 @@ class VariableCollector extends ParseTreeVisitor
     assignment.id = declaration.id
     
   visitIfStatement: (ifStatement) ->
+    super ifStatement
     condition = ifStatement.condition
     if condition.condition.charAt(0) is '$'
       condition.condition = condition.condition.substr 1
