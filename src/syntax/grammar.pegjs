@@ -17,12 +17,6 @@ _EOL
 __
   = ws+
 
-Indent
-  = "Indent" __
-
-Outdent
-  = "Outdent" __
-
 Identifier "Identfier"
   = name:([a-zA-Z0-9+-] / '_')+
      { return name.join(""); }
