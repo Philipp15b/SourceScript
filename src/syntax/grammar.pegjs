@@ -11,20 +11,20 @@ ws "Whitespace"
 _
   = ws*
 
-_EOL
-  = (ws / EndOfLine)*
-
 __
   = ws+
+
+_EOL
+  = (ws / EndOfLine)*
 
 Identifier "Identfier"
   = name:([a-zA-Z0-9+-] / '_')+
      { return name.join(""); }
-     
+
 VariableIdentifier "Variable Identfier"
   = head:'$'? tail:([a-zA-Z0-9+-] / '_')+
      { return head + tail.join(""); }
-     
+
 FunctionIdentifier "Function Identifier"
   = name:([a-zA-Z0-9+-:] / '_')+
      { return name.join(""); }
