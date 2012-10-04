@@ -1,6 +1,3 @@
-repeat = (str, num) ->
-  Array(num).join str
-
 removeDuplicateWhitespace = (text) ->
   text.replace /[\t\v\f \u00A0\uFEFF]{2,}/, ""
 
