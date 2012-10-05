@@ -74,7 +74,7 @@ module.exports = class Simplifier extends ParseTreeTransformer
   # Utility properties for special handling of
   # functions that contain + and -. See additional
   # info in @transformCommand.
-  before: false
+  before: null
   isInBind: false
 
   transformCommand: (cmd) ->
