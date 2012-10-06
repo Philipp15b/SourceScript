@@ -39,8 +39,8 @@ BooleanLiteral
   / "false" { return false; }
 
 Program
-  = program:(Statement StatementSeperator)* StatementSeperator?
-    { return new n.Block(helpers.every(0, program)).p(line, column); }
+  = program:(Statement Comment? StatementSeperator)* StatementSeperator?
+    { return new n.Block(helpers.filterProgram(program)).p(line, column); }
 
 StatementSeperator
   = ( _ (EndOfLine / ';') _ )+
@@ -94,7 +94,7 @@ Command "Command"
 
 CommandArgument
   = '"' content:(!'"' .)* '"' { return helpers.every(1, content).join(""); }
-  / content:(!(ws / EndOfLine / '{') .)+ { return helpers.every(1, content).join(""); }
+  / content:(!(ws / EndOfLine / '{' / '#') .)+ { return helpers.every(1, content).join(""); }
   / Block
 
 Comment "Comment"
