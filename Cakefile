@@ -32,7 +32,7 @@ task 'build:parser', 'build the peg.js parser', ->
 
 task 'browserify', 'build for browserify', ->
   browserify = require 'browserify'
-  {bundle} = browserify './lib/index.js'
+  {bundle} = browserify './lib/browserify.js'
   writeFileSync 'browser.js', bundle()
 
   invoke 'browserify:minify'

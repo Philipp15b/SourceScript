@@ -11,6 +11,7 @@
   ],
 
   "main": "lib/index.js",
+  "browserify": "lib/browserify.js",
 
   "dependencies": {
     "pegjs": ">= 0.7.0",

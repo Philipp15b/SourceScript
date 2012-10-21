@@ -1,0 +1,1 @@
+window.SourceScript = require './index'
