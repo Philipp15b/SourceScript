@@ -33,16 +33,24 @@ module.exports.compile = (files, libraryFiles = {}) ->
   # Parse libraries
   parsedLibraries = {}
   for name, content of libraryFiles
-    parseResult = parse content, variableIndex
-    parsedLibraries[name] = parseResult.file
-    {variableIndex} = parseResult
+    try
+      parseResult = parse content, variableIndex
+      parsedLibraries[name] = parseResult.file
+      {variableIndex} = parseResult
+    catch e
+      e.file = name
+      throw e
 
   # Parse the actual files
   parsedFiles = {}
   for name, content of files
-    parseResult = parse content, variableIndex
-    parsedFiles[name] = parseResult.file
-    {variableIndex} = parseResult
+    try
+      parseResult = parse content, variableIndex
+      parsedFiles[name] = parseResult.file
+      {variableIndex} = parseResult
+    catch e
+      e.file = name
+      throw e
   
   # Merge all files to one big object that
   # is given to the compiler for information
@@ -54,6 +62,10 @@ module.exports.compile = (files, libraryFiles = {}) ->
   # Now compile
   result = {}
   for name, file of parsedFiles
-    result[name] = compiler file, allFiles
+    try
+      result[name] = compiler file, allFiles
+    catch e
+      e.file = name
+      throw e
 
   result
