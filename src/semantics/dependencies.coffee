@@ -3,7 +3,8 @@ ParseTreeVisitor = require '../parse-tree-visitor'
 
 class DependencyAnalyzer extends ParseTreeVisitor
 
-  includes: []
+  constructor: ->
+    @includes = []
 
   visitCommand: (assignment) ->
     if assignment.name is "include"
