@@ -1,14 +1,17 @@
 {exec} = require 'child_process'
-{readFileSync, existsSync, writeFileSync, unlinkSync} = require 'fs'
-{rmdirSyncRecursive} = require 'wrench'
+{readFileSync, readdirSync, existsSync, renameSync, writeFileSync, unlinkSync} = require 'fs'
+path = require 'path'
+wrench = require 'wrench'
 mkdirSync = require('mkdirp').sync
+walkdir = require 'walkdir'
 PEG = require 'pegjs'
 uglify = require 'uglify-js'
+Mocha = require 'mocha'
 
 
 task 'clean', 'clean up the build path', ->
   unlinkSync file for file in ['browser.js', 'browser.min.js'] when existsSync file
-  rmdirSyncRecursive dir for dir in ['lib', 'bin'] when existsSync dir
+  wrench.rmdirSyncRecursive dir for dir in ['lib', 'bin'] when existsSync dir
 
 task 'build', 'build SourceScript from source', ->
   invoke 'clean'
@@ -25,6 +28,16 @@ task 'build:parser', 'build the peg.js parser', ->
 
   mkdirSync "./lib/syntax/" unless existsSync './lib/syntax'
   writeFileSync "./lib/syntax/grammar-parser.js", "module.exports = #{parser.toSource()}"
+
+task "test", "run tests", ->
+  mocha = new Mocha
+    reporter: 'spec'
+  walkdir.sync('./test/').filter( (file) ->
+    return file.substr(-7) is '.coffee' and file.indexOf('test-helper') is -1
+  ).forEach (file) ->
+    mocha.addFile file
+  require './test/test-helper.coffee' # this pollutes the globals
+  mocha.run()
 
 # -----------------
 # BROWSERIFY
