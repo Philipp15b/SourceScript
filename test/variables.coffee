@@ -5,6 +5,9 @@ describe "assignments", ->
   it "should compile correctly with false", ->
     expectCompile 'test = false', 'alias var_0_test "FalseHook;";'
 
+  it "should compile correctly when global", ->
+    expectCompile '$test = false', 'alias var__test "FalseHook;";'
+
 describe "conditions", ->
   it "should compile correctly", ->
     expectCompile """
