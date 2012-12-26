@@ -49,9 +49,15 @@ module.exports = class Compiler extends ParseTreeVisitor
       when true then "TrueHook;"
       when false then "FalseHook;"
 
-    @writeAlias "var_#{assignment.id}_#{assignment.name}", expression
+    declaration = unless assignment.name.charAt(0) is '$'
+       assignment.parent.scope.variable assignment.name
+    else
+      {id: "", name: assignment.name.substr(1)}
+
+    @writeAlias "var_#{declaration.id}_#{declaration.name}", expression
 
   visitFunctionDeclaration: (declaration) ->
+    # remove em all
 
   visitEnumerationDeclaration: (declaration) ->
     name = declaration.name
@@ -76,7 +82,8 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeAlias "FalseHook", ifStatement.else
 
     condition = ifStatement.condition
-    @writeln "var_#{condition.id}_#{condition.condition};"
+    declaration = ifStatement.parent.scope.variable condition.condition
+    @writeln "var_#{declaration.id}_#{declaration.name};"
 
   visitCommand: (command) ->
     @writeNodeInfo command

@@ -1,8 +1,8 @@
 Compiler = require './compiler'
 Simplifier = require './simplifier'
 
-module.exports = (file, otherFiles = {}) ->
-  simplifier = new Simplifier file, otherFiles
-  compiler = new Compiler no # debug isnt really helpful yet
-  compiler.visit simplifier.transform file.ast
+module.exports = (ast) ->
+  simplifier = new Simplifier
+  compiler = new Compiler no # debug mode isnt really helpful yet
+  compiler.visit simplifier.transform ast
   compiler.compiled

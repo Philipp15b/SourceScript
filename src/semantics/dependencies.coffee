@@ -1,8 +1,6 @@
-{normalize} = require 'path'
 ParseTreeVisitor = require '../parse-tree-visitor'
 
 class DependencyAnalyzer extends ParseTreeVisitor
-
   constructor: ->
     @includes = []
 
@@ -12,11 +10,14 @@ class DependencyAnalyzer extends ParseTreeVisitor
         throw new Error "include declaration must have exactly one parameter!"
       unless assignment.args[0].substring? # check if it is a string
         throw new Error "include declaration must have a string as parameter!"
-      @includes.push normalize assignment.args[0]
+      @includes.push assignment.args[0]
 
-# Returns an array of all files the given ASTs includes,
-# the paths are relative to the file.
-module.exports = getDependencies = (ast) ->
+module.exports = setDependencies = (ast, files) ->
   analyzer = new DependencyAnalyzer()
   analyzer.visit ast
-  analyzer.includes
+
+  filescope = ast.scope
+  for include in analyzer.includes
+    unless files[include]?
+      throw new Error "Could not find dependency #{include}!"
+    filescope.dependencies.push files[include].scope
