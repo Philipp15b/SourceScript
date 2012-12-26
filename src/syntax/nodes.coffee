@@ -3,7 +3,7 @@ createNodes = (superclass, data) ->
   for name, properties of data then do (name, properties) ->
     klass = class extends superclass
       constructor: unless properties? then ->
-        @className = name
+        @type = name
       else ->
         for property, i in properties
           @[property] = arguments[i]
@@ -29,12 +29,12 @@ module.exports = createNodes Node,
 
   FunctionDeclaration: ['name', 'body']
   FunctionCall: ['name']
-  
+
   EnumerationDeclaration: ['name', 'content']
 
   IfStatement: ['condition', 'if', 'else']
   Condition: ['condition', 'isNegated']
 
   Command: ['name', 'args']
-  
+
   Comment: ['content']
