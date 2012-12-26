@@ -1,8 +1,6 @@
 ParseTreeVisitor = require '../parse-tree-visitor'
 
 module.exports = class Compiler extends ParseTreeVisitor
-  constructor: (@DEBUG = off) ->
-
   # The compiled source code.
   compiled: ""
 
@@ -22,16 +20,12 @@ module.exports = class Compiler extends ParseTreeVisitor
       @write '\n'
 
   writeAlias: (name, content = "") ->
-    if content.type?
+    if content.type is "Block"
       @write "alias #{name} \""
       @visitBlockInline content
       @writeln '";'
     else
       @writeln "alias #{name} \"#{content}\";"
-
-  writeNodeInfo: (node) ->
-    if @DEBUG and not @inline
-      @write "\n# #{node.type} in line #{node.line}, column #{node.column}\n"
 
   visitBlockInline: (tree) ->
     inlineBefore = @inline
@@ -44,7 +38,6 @@ module.exports = class Compiler extends ParseTreeVisitor
 
   # Actual node type handlers
   visitVariableAssignment: (assignment) ->
-    @writeNodeInfo assignment
     expression = switch assignment.expression
       when true then "TrueHook;"
       when false then "FalseHook;"
@@ -57,7 +50,6 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeAlias "var_#{declaration.id}_#{declaration.name}", expression
 
   visitFunctionDeclaration: (declaration) ->
-    # remove em all
 
   visitEnumerationDeclaration: (declaration) ->
     name = declaration.name
@@ -77,7 +69,6 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeln "\";"
 
   visitIfStatement: (ifStatement) ->
-    @writeNodeInfo ifStatement
     @writeAlias "TrueHook", ifStatement.if
     @writeAlias "FalseHook", ifStatement.else
 
@@ -86,7 +77,6 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeln "var_#{declaration.id}_#{declaration.name};"
 
   visitCommand: (command) ->
-    @writeNodeInfo command
     @write command.name
     for arg in command.args
       if arg.type?
