@@ -5,7 +5,7 @@ wrench = require 'wrench'
 mkdirSync = require('mkdirp').sync
 walkdir = require 'walkdir'
 PEG = require 'pegjs'
-uglify = require 'uglify-js'
+UglifyJS = require 'uglify-js'
 Mocha = require 'mocha'
 
 
@@ -51,9 +51,5 @@ task 'browserify', 'build for browserify', ->
   invoke 'browserify:minify'
 
 task 'browserify:minify', 'minify the browserified file', ->
-  original = readFileSync('./browser.js').toString()
-  ast = uglify.parser.parse original
-  ast =  uglify.uglify.ast_mangle ast
-  ast = uglify.uglify.ast_squeeze ast
-  code = uglify.uglify.gen_code ast
-  writeFileSync './browser.min.js', code
+  result = UglifyJS.minify './browser.js'
+  writeFileSync './browser.min.js', result.code
