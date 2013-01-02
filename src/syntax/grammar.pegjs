@@ -22,8 +22,8 @@ Identifier "Identfier"
      { return name.join(""); }
 
 VariableIdentifier "Variable Identfier"
-  = head:'$'? tail:([a-zA-Z0-9+-] / '_')+
-     { return head + tail.join(""); }
+  = sign:'$'? name:Identifier
+     { return sign + name; }
 
 FunctionIdentifier "Function Identifier"
   = name:([a-zA-Z0-9+-:] / '_')+
@@ -39,10 +39,10 @@ BooleanLiteral
   / "false" { return false; }
 
 Program
-  = program:(Statement Comment? StatementSeperator)* StatementSeperator?
+  = program:(Statement Comment? StatementSeperators)* StatementSeperators?
     { return new n.Block(helpers.filterProgram(program)).p(line, column); }
 
-StatementSeperator
+StatementSeperators
   = ( _ (EndOfLine / ';') _ )+
 
 Block
@@ -63,7 +63,7 @@ VariableAssignment "Variable Assignment"
     { return new n.VariableAssignment(name, expr).p(line, column); }
 
 FunctionDeclaration "Function Declaration"
-  = "function" __ name:FunctionIdentifier _ "()" _ expr:Block
+  = "function" __ name:FunctionIdentifier "()" _ expr:Block
     { return new n.FunctionDeclaration(name, expr).p(line, column); }
 
 EnumerationDeclaration "Enumeration Declaration"
@@ -71,11 +71,11 @@ EnumerationDeclaration "Enumeration Declaration"
     { return new n.EnumerationDeclaration(name, content).p(line, column); }
 
 BlockList
-  = head:Block tail:(',' _EOL Block)*
-    { return [head].concat(helpers.every(2, tail)); }
+  = first:Block others:(',' _EOL Block)*
+    { return [first].concat(helpers.every(2, others)); }
 
 FunctionCall "Function Call"
-  = name:FunctionIdentifier _ "()"
+  = name:FunctionIdentifier "()"
      { return new n.FunctionCall(name).p(line, column); }
 
 IfStatement "If Statement"
