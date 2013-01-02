@@ -35,6 +35,6 @@ module.exports = createNodes Node,
   IfStatement: ['condition', 'if', 'else']
   Condition: ['condition', 'isNegated']
 
-  Command: ['name', 'args']
+  Command: ['name', 'args', 'compilercommand']
 
   Comment: ['content']
