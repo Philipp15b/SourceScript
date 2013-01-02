@@ -2,15 +2,10 @@ createNodes = (superclass, data) ->
   nodes = {}
   for name, properties of data then do (name, properties) ->
     klass = class extends superclass
-      constructor: unless properties? then ->
-        @type = name
-      else ->
+      constructor: ->
         for property, i in properties
           @[property] = arguments[i]
-
         @type = name
-
-        this
 
     nodes[name] = klass
 
