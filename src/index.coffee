@@ -21,8 +21,8 @@ module.exports.compile = (files, options = {}) ->
   result = {}
   for name, ast of parsed
     try
+      plugins ast, options.plugins      
       semantics ast, parsed, options.scope
-      plugins ast, options.plugins
       result[name] = compiler ast
     catch e
       e.file = name
