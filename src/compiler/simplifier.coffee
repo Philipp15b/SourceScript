@@ -79,4 +79,4 @@ module.exports = class Simplifier extends ParseTreeTransformer
     if ifStatement.condition.isNegated
       [ifStatement.if, ifStatement.else] = [ifStatement.else, ifStatement.if]
       delete ifStatement.condition.isNegated
-    ifStatement
+    super ifStatement
