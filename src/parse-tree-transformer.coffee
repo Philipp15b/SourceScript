@@ -32,7 +32,7 @@ module.exports = class ParseTreeTransformer
     call
 
   transformIfStatement: (ifStatement) ->
-    @transformCondition ifStatement.condition
+    ifStatement.condition = @transformCondition ifStatement.condition
     if ifStatement.if?
       ifStatement.if = @transformBlock ifStatement.if
     if ifStatement.else?
