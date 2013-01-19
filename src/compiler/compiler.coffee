@@ -89,4 +89,4 @@ module.exports = class Compiler extends ParseTreeVisitor
 
   visitComment: (comment) ->
     unless @inline
-      @write "\n##{comment.content}\n"
+      @write "\n//#{comment.content}\n"

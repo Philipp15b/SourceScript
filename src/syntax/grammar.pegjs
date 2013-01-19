@@ -98,5 +98,5 @@ CommandArgument
   / Block
 
 Comment "Comment"
-  = '#' content:(!EndOfLine .)*
+  = ('#' / '//') content:(!EndOfLine .)*
      { return new n.Comment(helpers.every(1, content).join("")); }
