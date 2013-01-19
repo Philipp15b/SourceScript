@@ -72,8 +72,11 @@ module.exports = class Compiler extends ParseTreeVisitor
     @writeAlias "TrueHook", ifStatement.if
     @writeAlias "FalseHook", ifStatement.else
 
-    condition = ifStatement.condition
-    declaration = ifStatement.parent.scope.variable condition.condition
+    name = ifStatement.condition.condition
+    declaration = unless name.charAt(0) is '$'
+      ifStatement.parent.scope.variable name
+    else
+      {id: "", name: name.substr(1)}
     @writeln "var_#{declaration.id}_#{declaration.name};"
 
   visitCommand: (command) ->
