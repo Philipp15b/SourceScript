@@ -1,82 +1,106 @@
 ParseTreeTransformer = require '../parse-tree-transformer'
 nodes = require '../syntax/nodes'
+{Scope} = require '../semantics/scope'
+
+ALIAS = (name, content) -> new nodes.Command "alias", [name, content], false
+VARNAME = (scope, name) ->
+  declaration = unless name.charAt(0) is '$'
+    v = scope.variable name
+    unless v?
+      throw new Error "Could not find variable #{name}!"
+    "var_#{v.id}_#{v.name}"
+  else
+    "var_#{name.substr(1)}"
+FUNC = (filescope, name, call) ->
+  func = filescope.function name
+  unless func?
+    throw new Error "Could not find function with name #{name} in line #{call.line}, column #{call.column}!"
+  func
 
 module.exports = class Simplifier extends ParseTreeTransformer
+  constructor: ->
+    # A stack of statements that go into the minus alias of a bind.
+    @bindMinusAliasStack = []
+
+  # Replaces a function call with the associated function body.
+  # If the bindMinusAliasStack is not empty (which means we are in a bind)
+  # and there exist plus and minus functions, the minus alias will be added to the top of
+  # the bindMinusAliasStack so that it will be called correctly.
   transformFunctionCall: (call) ->
     filescope = call.parent.scope.file()
     unless call.name.charAt(0) is '+'
-      func = filescope.function call.name
-      unless func?
-        throw new Error "Could not find function with name #{call.name} in line #{call.line}, column #{call.column}!"
-      func.body
-    # Function calls beginning with a plus need helper aliases so that
-    # the associated minus function is correctly called within binds.
+      @transformBlock FUNC(filescope, call.name, call).body
     else
-      name = call.name.slice 1
-      normalized = name.replace /:/g, '_' # replace colons with underscores because they're not allowed.
+      base = call.name.slice 1
+      normalized = base.replace /:/g, '_' # replace colons with underscores because they're not allowed.
 
-      # Alias for the + function
-      plusFunction = filescope.function "+#{name}"
-      unless plusFunction?
-        throw new Error "Could not find function with name +#{name} in line #{call.line}, column #{call.column}!"
-      plusAlias = new nodes.Command "alias", [
-        "+#{normalized}",
-        plusFunction.body
-      ]
+      plus = @transformBlock FUNC(filescope, "+#{normalized}", call).body
+      minus = @transformBlock FUNC(filescope, "-#{normalized}", call).body
 
-      # Alias for the - function
-      minusFunction = filescope.function "-#{name}"
-      unless plusFunction?
-        throw new Error "Could not find function with name -#{name} in line #{call.line}, column #{call.column}!"
-      minusAlias = new nodes.Command "alias", [
-        "-#{normalized}",
-        minusFunction.body
-      ]
+      statements = []
 
-      # Command to call the + function.
-      callCommand = new nodes.Command("+" + normalized, [])
-
-      # If we are in a bind, then assign the block to
-      # the @before property. This is necessary to prepend
-      # aliases to the bind. See @transformCommand for more info.
-      unless @isInBind
-        new nodes.Block [plusAlias, minusAlias, callCommand]
+      if @bindMinusAliasStack.length > 0
+        statements = statements.concat plus.statements
+        @bindMinusAliasStack[@bindMinusAliasStack.length-1] = @bindMinusAliasStack[@bindMinusAliasStack.length-1].concat minus.statements
       else
-        @before = [plusAlias, minusAlias]
-        callCommand
+        # if we are not directly in a bind, we just generate auxiliary aliases
+        statements.push ALIAS "+#{normalized}", plus
+        statements.push ALIAS "-#{normalized}", minus
+        statements.push new nodes.Command "+#{normalized}", []
 
-  # Utility properties for special handling of
-  # functions that contain + and -. See additional
-  # info in @transformCommand.
-  before: null
-  isInBind: false
+      new nodes.Block statements
 
   transformCommand: (cmd) ->
-    # Remove all include commands, because they are only
-    # used by the compiler.
     if cmd.name is "include"
       undefined
+    else if cmd.name is "bind" and cmd.args[1]?.type is "Block"
+      aliasBase = "_bind_#{Scope.global.nextVariableIndex()}"
 
-    # If the command is a bind, mark it and
-    # prepend the value of @before to this command.
-    # This is necessary for function calls that contain
-    # + and -, because they need aliases which are not allowed
-    # within a bind.
-    else if cmd.name is "bind"
-      wasInBind = @isInBind
-      @isInBind = true
+      @bindMinusAliasStack.push []
       cmd = super cmd
-      @isInBind = false unless wasInBind
+      minusAliasStatements = @bindMinusAliasStack.pop()
 
-      @before ?= []
-      new nodes.Block @before.concat cmd
+      repl = [ALIAS "+#{aliasBase}", cmd.args[1]]
+      if minusAliasStatements.length > 0 # only create minus alias when necessary.
+        repl.push ALIAS "-#{aliasBase}", new nodes.Block minusAliasStatements
+      cmd.args[1] = "+#{aliasBase}"
+      repl.push cmd
 
+      new nodes.Block repl
     else
       super cmd
 
-  # Simplify negated if statement
+  transformVariableAssignment: (assignment) ->
+    expression = switch assignment.expression
+      when true then "TrueHook"
+      when false then "FalseHook"
+    ALIAS VARNAME(assignment.parent.scope, assignment.name), expression
+
   transformIfStatement: (ifStatement) ->
+    ifStatement = super ifStatement
+
     if ifStatement.condition.isNegated
       [ifStatement.if, ifStatement.else] = [ifStatement.else, ifStatement.if]
-      delete ifStatement.condition.isNegated
-    super ifStatement
+      ifStatement.condition.isNegated = false
+
+    new nodes.Block [
+      ALIAS "TrueHook", ifStatement.if
+      ALIAS "FalseHook", ifStatement.else
+      new nodes.Command VARNAME(ifStatement.parent.scope, ifStatement.condition.condition), [], false
+    ]
+
+  transformEnumerationDeclaration: (declaration) ->
+    declaration = super declaration
+
+    name = declaration.name
+    repl = [ALIAS(name, "#{name}_0")]
+
+    for block, i in declaration.content
+      nextIndex = (i + 1) % declaration.content.length
+      block.statements.push ALIAS(name, "#{name}_#{nextIndex}") # set enum function to next item
+      repl.push ALIAS("#{name}_#{i}", block)
+
+    new nodes.Block repl
+
+  transformFunctionDeclaration: ->
+    undefined

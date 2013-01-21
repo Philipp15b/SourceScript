@@ -23,7 +23,25 @@ describe "functions", ->
       +DoSomething()
       """,
       """
-      alias "+DoSomething" "cmd1; ";
-      alias "-DoSomething" "cmd2; ";
+      alias "+DoSomething" "cmd1";
+      alias "-DoSomething" "cmd2";
       +DoSomething;
       """
+
+  it "should be moved into auxiliary aliases out of binds", ->
+    expectCompile """
+    function +Hello() {
+      echo "hello plus"
+    }
+    function -Hello() {
+      echo "hello minus"
+    }
+    bind "p" {
+      +Hello()
+    }
+    """,
+    """
+    alias "+_bind_0" "echo "hello plus"";
+    alias "-_bind_0" "echo "hello minus"";
+    bind "p" "+_bind_0";
+    """
