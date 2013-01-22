@@ -84,8 +84,8 @@ module.exports = class Simplifier extends ParseTreeTransformer
       ifStatement.condition.isNegated = false
 
     new nodes.Block [
-      ALIAS "TrueHook", ifStatement.if
-      ALIAS "FalseHook", ifStatement.else
+      ALIAS "TrueHook", ifStatement.if ? ""
+      ALIAS "FalseHook", ifStatement.else ? ""
       new nodes.Command VARNAME(ifStatement.parent.scope, ifStatement.condition.condition), [], false
     ]
 
