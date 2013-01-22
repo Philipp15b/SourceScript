@@ -102,5 +102,17 @@ module.exports = class Simplifier extends ParseTreeTransformer
 
     new nodes.Block repl
 
+  blockDepth: -1
+
+  transformBlock: (block) ->
+    @blockDepth++
+    block = super block
+    @blockDepth--
+    block
+
+  transformComment: (comment) ->
+    return undefined if @blockDepth > 0
+    super comment
+
   transformFunctionDeclaration: ->
     undefined
