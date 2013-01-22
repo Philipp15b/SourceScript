@@ -40,8 +40,7 @@ module.exports = class Compiler extends ParseTreeVisitor
       @write '; '
 
   visitComment: (comment) ->
-    if @inlineLevel is 0
-      @write "\n//#{comment.content}\n"
+    @write "\n//#{comment.content}\n"
 
   visitVariableAssignment: NOTALLOWED
   visitFunctionDeclaration: NOTALLOWED
