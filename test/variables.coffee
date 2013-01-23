@@ -47,22 +47,16 @@ describe "conditions", ->
       test2 = true
       if test {
         if test2 {
-          if test {
-            this
-          } else {
-            that
-          }
-        } else {
+          that1
           that2
         }
-      } else {
-        that3
       }
       """,
       """
       alias "var_0_test" "TrueHook";
       alias "var_1_test2" "TrueHook";
-      alias "TrueHook" "alias "TrueHook" "alias "TrueHook" "this"; alias "FalseHook" "that"; var_0_test"; alias "FalseHook" "that2"; var_1_test2";
-      alias "FalseHook" "that3";
+      alias "_alias_2" "that1; that2";
+      alias "TrueHook" "alias "TrueHook" "_alias_2"; alias "FalseHook" ""; var_1_test2";
+      alias "FalseHook" "";
       var_0_test;
       """

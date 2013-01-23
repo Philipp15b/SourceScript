@@ -23,17 +23,19 @@ describe "functions", ->
       +DoSomething()
       """,
       """
-      alias "+DoSomething" "cmd1";
-      alias "-DoSomething" "cmd2";
-      +DoSomething;
+      alias "+func_DoSomething" "cmd1";
+      alias "-func_DoSomething" "cmd2";
+      +func_DoSomething;
       """
 
   it "should be moved into auxiliary aliases out of binds", ->
     expectCompile """
     function +Hello() {
       echo "hello plus"
+      echo "hello plus"
     }
     function -Hello() {
+      echo "hello minus"
       echo "hello minus"
     }
     bind "p" {
@@ -41,7 +43,8 @@ describe "functions", ->
     }
     """,
     """
-    alias "+_bind_0" "echo "hello plus"";
-    alias "-_bind_0" "echo "hello minus"";
+    alias "+func_Hello" "echo "hello plus"; echo "hello plus"";
+    alias "-func_Hello" "echo "hello minus"; echo "hello minus"";
+    alias "+_bind_0" "+func_Hello";
     bind "p" "+_bind_0";
     """
