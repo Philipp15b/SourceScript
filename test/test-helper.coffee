@@ -5,8 +5,11 @@ global.expectCompile = (source, expected) ->
   compiled = SourceScript.compile 'test.ss': source
   output = compiled['test.ss'].trim '\n '
   if output isnt expected
-    throw new Error "Compiled source code does not match expectation! Expected:
+    throw new Error """
+    Compiled source code does not match expectation!
+    EXPECTED:
     #{expected}
 
-    Compiled:
-    #{output}"
+    COMPILED:
+    #{output}
+    """
