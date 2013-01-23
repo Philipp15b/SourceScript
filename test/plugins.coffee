@@ -23,10 +23,10 @@ describe "plugins", ->
       throw new Error "Replacement was not inserted!"
 
   it "must exist", ->
-    failure = yes
+    wasErr = no
     try
       SourceScript.compile 'test.ss': ":testcommand"
     catch e
-      failure = e.message.indexOf("Could not find compiler command") is -1
-    if failure
+      wasErr = e.message.indexOf("Could not find compiler command") isnt -1
+    unless wasErr
       throw new Error "Error expected!"
