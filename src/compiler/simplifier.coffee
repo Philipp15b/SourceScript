@@ -4,18 +4,18 @@ nodes = require '../syntax/nodes'
 
 CMD = (name, args...) -> new nodes.Command name, args, false
 ALIAS = (name, content) -> new nodes.Command "alias", [name, content], false
-VARNAME = (scope, name) ->
+VARNAME = (node, scope, name) ->
   declaration = unless name.charAt(0) is '$'
     v = scope.variable name
     unless v?
-      throw new Error "Could not find variable #{name}!"
+      throw new Error "Could not find variable #{name} in line #{node.line}, column #{node.column}!"
     "var_#{v.id}_#{v.name}"
   else
     "var_#{name.substr(1)}"
-FUNC = (filescope, name, call) ->
+FUNC = (node, filescope, name) ->
   func = filescope.function name
   unless func?
-    throw new Error "Could not find function with name #{name} in line #{call.line}, column #{call.column}!"
+    throw new Error "Could not find function #{name} in line #{node.line}, column #{node.column}!"
   func
 
 module.exports = class Simplifier extends ParseTreeTransformer
@@ -76,13 +76,13 @@ module.exports = class Simplifier extends ParseTreeTransformer
   transformFunctionCall: (call) ->
     filescope = call.parent.scope.file()
     unless call.name.charAt(0) is '+'
-      @transformList FUNC(filescope, call.name, call).body.statements
+      @transformList FUNC(call, filescope, call.name).body.statements
     else
       base = call.name.slice 1
       normalized = "func_#{base.replace /:/g, '_'}" # replace colons with underscores because they're not allowed.
 
-      plus = @transformBlock FUNC(filescope, "+#{base}", call).body
-      minus = @transformBlock FUNC(filescope, "-#{base}", call).body
+      plus = @transformBlock FUNC(call, filescope, "+#{base}").body
+      minus = @transformBlock FUNC(call, filescope, "-#{base}").body
 
       if @preBlock?
         @preBlock.push ALIAS("+#{normalized}", plus)
@@ -99,7 +99,7 @@ module.exports = class Simplifier extends ParseTreeTransformer
     expression = switch assignment.expression
       when true then "TrueHook"
       when false then "FalseHook"
-    @transformCommand ALIAS VARNAME(assignment.parent.scope, assignment.name), expression
+    @transformCommand ALIAS VARNAME(assignment, assignment.parent.scope, assignment.name), expression
 
   transformIfStatement: (ifStatement) ->
     ifStatement = super ifStatement
@@ -111,7 +111,7 @@ module.exports = class Simplifier extends ParseTreeTransformer
     @transformList [
       ALIAS "TrueHook", ifStatement.if ? ""
       ALIAS "FalseHook", ifStatement.else ? ""
-      CMD VARNAME(ifStatement.parent.scope, ifStatement.condition.condition)
+      CMD VARNAME(ifStatement, ifStatement.parent.scope, ifStatement.condition.condition)
     ]
 
   transformEnumerationDeclaration: (declaration) ->
