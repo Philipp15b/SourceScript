@@ -10,7 +10,10 @@ module.exports = class ParseTreeTransformer
     newlist = []
     for item in list
       if (newitem = @transformAny item)?
-        newlist.push newitem
+        if Array.isArray newitem
+          newlist = newlist.concat newitem
+        else
+          newlist.push newitem
     newlist
 
   transformBlock: (block) ->
