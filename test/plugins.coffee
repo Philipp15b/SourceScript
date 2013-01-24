@@ -9,7 +9,7 @@ describe "plugins", ->
           cmd.name = "testreplacement"
           cmd
 
-    if out["test.ss"].indexOf("testreplacement;") is -1
+    if out["test.ss"].indexOf("testreplacement") is -1
       throw new Error "Replacement was not inserted!"
 
 
@@ -19,7 +19,7 @@ describe "plugins", ->
         testcommand: (cmd) ->
           "testreplacement # This is awesome"
 
-    if out["test.ss"].indexOf("testreplacement;") is -1
+    if out["test.ss"].indexOf("testreplacement") is -1
       throw new Error "Replacement was not inserted!"
 
   it "must exist", ->

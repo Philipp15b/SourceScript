@@ -26,16 +26,14 @@ module.exports = class Compiler extends ParseTreeVisitor
     for arg in command.args
       @write " "
       if arg.type is "Block"
-        quote = arg.statements.length is 0 or
-            (arg.statements.length is 1 and
-            arg.statements[0].args.length is 0)
+        quote = arg.statements.length isnt 1 or arg.statements[0].args.length > 0
         @write '"' if quote
         @inlineLevel++
         @visitBlock arg
         @inlineLevel--
         @write '"' if quote
       else
-        quote = arg.indexOf(" ") >= 0
+        quote = arg.length is 0 or arg.indexOf(" ") >= 0
         @write '"' if quote
         @write arg
         @write '"' if quote

@@ -7,5 +7,5 @@ describe "blocks", ->
       }
       """,
       """
-      alias "combo" "command1; command2";
+      alias combo "command1; command2"
       """

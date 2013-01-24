@@ -7,7 +7,7 @@ describe "functions", ->
 	  testfunc()
 	  """,
 	  """
-	  command;
+	  command
     """
 
   it "should be translated to aliases when using plus prefix", ->
@@ -23,9 +23,9 @@ describe "functions", ->
       +DoSomething()
       """,
       """
-      alias "+func_DoSomething" "cmd1";
-      alias "-func_DoSomething" "cmd2";
-      +func_DoSomething;
+      alias +func_DoSomething cmd1
+      alias -func_DoSomething cmd2
+      +func_DoSomething
       """
 
   it "should be moved into auxiliary aliases out of binds", ->
@@ -43,8 +43,8 @@ describe "functions", ->
     }
     """,
     """
-    alias "+func_Hello" "echo "hello plus"; echo "hello plus"";
-    alias "-func_Hello" "echo "hello minus"; echo "hello minus"";
-    alias "+_bind_0" "+func_Hello";
-    bind "p" "+_bind_0";
+    alias +func_Hello "echo "hello plus"; echo "hello plus""
+    alias -func_Hello "echo "hello minus"; echo "hello minus""
+    alias +_bind_0 +func_Hello
+    bind p +_bind_0
     """
