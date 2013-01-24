@@ -24,18 +24,25 @@ module.exports = class Compiler extends ParseTreeVisitor
   visitCommand: (command) ->
     @write command.name
     for arg in command.args
-      @write " \""
+      @write " "
       if arg.type is "Block"
+        quote = arg.statements.length is 0 or
+            (arg.statements.length is 1 and
+            arg.statements[0].args.length is 0)
+        @write '"' if quote
         @inlineLevel++
         @visitBlock arg
         @inlineLevel--
+        @write '"' if quote
       else
+        quote = arg.indexOf(" ") >= 0
+        @write '"' if quote
         @write arg
-      @write "\""
+        @write '"' if quote
 
     # write the delimiter
     if @inlineLevel is 0
-      @write ';\n'
+      @write '\n'
     else if not @isLast
       @write '; '
 
