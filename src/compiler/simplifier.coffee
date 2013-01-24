@@ -5,7 +5,7 @@ nodes = require '../syntax/nodes'
 CMD = (name, args...) -> new nodes.Command name, args, false
 ALIAS = (name, content) -> new nodes.Command "alias", [name, content], false
 VARNAME = (node, scope, name) ->
-  declaration = unless name.charAt(0) is '$'
+  unless name.charAt(0) is '$'
     v = scope.variable name
     unless v?
       throw new Error "Could not find variable #{name} in line #{node.line}, column #{node.column}!"
