@@ -11,10 +11,11 @@ class CommandParseTreeTransformer extends ParseTreeTransformer
 
     repl = @plugins[cmd.name](cmd)
     if repl.substr?
-      repl = parse repl
-    unless repl.type?
+      parse repl
+    else if Array.isArray repl
+      @transformList repl
+    else if !repl.type?
       throw new Error "Command callback for command :#{cmd.name} didn't return a valid node!"
-    repl
 
 module.exports = (ast, plugins) ->
   cptt = new CommandParseTreeTransformer plugins
