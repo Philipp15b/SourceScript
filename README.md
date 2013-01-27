@@ -3,120 +3,52 @@ SourceScript is a small and simple programming language that
 aims to simplifiy programming configurations for Valve's
 games based on the Source Engine.
 
-It introduces boolean variables, conditional statements, enumerations
-and some more readable syntax for commands.
+It introduces boolean variables, conditional statements, enumerations, functions
+and a more readable syntax for commands.
 
-## Syntax
+**See [the website](http://sourcescript.philworld.de/) for more information about the language and an interactive editor.**
 
-SourceScript is fully backwards-compatible to the regular configuration files,
-which means that you can just go ahead and copy your scripts to SourceScript
-and enhance them with SourceScript-specific syntax.
+## Building
 
-### Extended Command Syntax
+Make sure to have Node.js installed.
 
-When defining aliases, you always write code as arguments which can be pretty messy.
+    npm install -g coffee-script
+    git clone https://github.com/Philipp15b/SourceScript.git
+    cd SourceScript
+    npm install
+    cake build
+    cake browserify
 
-SourceScript introduces a new syntax with braces that allows you to
-write code like in every other language.
+## API
 
-    alias "do" {
-      +attack
-      -attack
-    }
+To compile scripts via the API (a command-line interface not done yet), load SourceScript and call `compile`.
 
-As you can see, the code gets much more readable.
+```coffee-script
+SourceScript = require 'SourceScript'
+files = 
+  'some/folder/autoexec.ss': 'echo "hello world"'
+try
+   out = SourceScript.compile files
+catch e
+   console.log e
+```
 
-### Variables
+You can also create custom compiler commands (commands beginning with a `:`) through plugins.
 
-With variables you can easily save yes/no states (called booleans).
-`true` equals yes and `false` equals no.
+```coffee-script
+SourceScript = require 'SourceScript'
+nodes = SourceScript.nodes
 
-Assigning a value to a variable just works like in any other programming language:
+files = 
+  'some/folder/autoexec.ss': 'echo "hello world"'
+options = 
+  plugins:
+    'uselesscomment': (cmd) ->
+       new nodes.Comment 'This comment is so useless'
+try
+   out = SourceScript.compile files, options
+catch e
+   console.log e
+```
 
-    isCompetitive = true
-
-#### Variable scope
-
-SourceScript is block-scoped. **TODO**
-
-### Conditional Statements
-
-To check for a variables value, use `if` statements:
-
-    if isCompetitive {
-      aimbotOff()
-    } else {
-      aimbotOn()
-    }
-
-This will check if isCompetitive is `true`. If yes, it will call the function
-`aimbotOff` and if not, it will call `aimbotOn`.
-
-#### Negations
-
-To check for the inverted variable value, use an exclamation mark:
-
-    if !isHungry {
-      playMore()
-    }
-
-### Enumerations
-
-Now this is a really handy feature of SourceScript. You can use enumerations to
-scroll through a list of actions. Every time the enumeration is called,
-The next block will be assigned to the name of the enumeration.
-
-    enum nextweapon {
-        {
-           slot2
-        },
-        {
-           slot3
-        },
-        {
-           slot1
-        }
-    }
-
-So when `nextweapon` is called, it will first execute the first command, `slot2`.
-After that, it will assign the next command to `nextweapon` and so on.
-
-Let's just see what that compiles to:
-
-    alias nextweapon "nextweapon_0";
-    alias nextweapon_0 "slot2; alias nextweapon "nextweapon_1"";
-    alias nextweapon_1 "slot3; alias nextweapon "nextweapon_2"";
-    alias nextweapon_2 "slot1; alias nextweapon "nextweapon_0"";
-
-### Functions
-
-Functions are a way to remove code duplication by
-defining functions that do the work. The function call
-is replaced by the function code when compiling.
-
-Also, unused functions are not going to be compiled into
-the final code, which means that it is really handy to define
-a huge library of functions, which you can then use in your binds.
-
-     function +Pyro::Panic() {
-        battlecry
-        cl_yawspeed 3000
-        +left
-        +attack
-     }
-
-     function -Pyro::Panic() {
-         -attack
-         -left
-         cl_yawspeed 210
-     }
-
-This piece of code defines two functions with the names
-`+Pyro::Panic()` and `-Pyro::Panic()`. Then you can just call
-the functions like this:
-
-      +Pyro::Panic()
-      -Pyro::Panic()
-
-**Warning:** Dont use `bind "MOUSE4" "Pyro::Panic()"`, because the function call is
-not going to be replaced when you use quotation marks in arguments.
+Now whenever you call `:uselesscomment` in your code, it will be replaced with a comment.
