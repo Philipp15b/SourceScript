@@ -5,21 +5,22 @@ NOTALLOWED = (node) -> throw new Error "Node of type #{node.type} is not allowed
 # The compiler is responsible to compile the simplified AST
 # to Source Cfg code.
 module.exports = class Compiler extends ParseTreeVisitor
+  constructor: ->
+    @isLastStack = []
+
   # The compiled source code.
   compiled: ""
-
-  inlineLevel: 0
-  isLast: false
 
   # Utility methods
   write: (text) ->
     @compiled += text
 
   visitList: (list) ->
+    @isLastStack.push false
     for item, i in list
-      @isLast = i is list.length-1
+      @isLastStack[@isLastStack.length-1] = i is list.length-1
       @visitAny item
-    @isLast = false
+    @isLastStack.pop()
 
   visitCommand: (command) ->
     @write command.name
@@ -28,9 +29,7 @@ module.exports = class Compiler extends ParseTreeVisitor
       if arg.type is "Block"
         quote = arg.statements.length isnt 1 or arg.statements[0].args.length > 0
         @write '"' if quote
-        @inlineLevel++
         @visitBlock arg
-        @inlineLevel--
         @write '"' if quote
       else
         quote = arg.length is 0 or arg.indexOf(" ") >= 0
@@ -39,9 +38,9 @@ module.exports = class Compiler extends ParseTreeVisitor
         @write '"' if quote
 
     # write the delimiter
-    if @inlineLevel is 0
+    if @isLastStack.length is 1 # top level
       @write '\n'
-    else if not @isLast
+    else if not @isLastStack[@isLastStack.length-1]
       @write '; '
 
   visitComment: (comment) ->
