@@ -11,9 +11,11 @@ class CommandParseTreeTransformer extends ParseTreeTransformer
 
     repl = @plugins[cmd.name](cmd)
     if repl.substr?
-      parse repl
+      @transformList parse(repl).statements
     else if Array.isArray repl
       @transformList repl
+    else if repl.type is "Block"
+      @transformList repl.statements
     else if repl.type?
       repl
     else
