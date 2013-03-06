@@ -1,5 +1,5 @@
-node_modules
-bin
-lib
+src
+.gitignore
+Cakefile
 browser.js
 browser.min.js

@@ -1,32 +1,39 @@
-syntax = require './syntax'
-semantics = require './semantics'
-{GlobalScope} = require './semantics/scope'
+parse = require './parser'
 plugins = require './plugins'
-compiler = require './compiler'
+{GlobalScope, assignScopes} = require './scope'
+compile = require './compiler'
+CompilerError = require './error'
 
-module.exports.parse = syntax.parse
-module.exports.nodes = require './syntax/nodes'
+module.exports =
+  nodes: require './nodes'
+  parse: parse
+  compileAST: compile
+  CompilerError: CompilerError
 
-module.exports.compile = (files, options = {}) ->
-  options.scope ?= new GlobalScope
-  options.plugins ?= {}
+  compile: (files, options = {}) ->
+    options.plugins ?= {}
+    options.plugins[name] ?= handler for name, handler of plugins.builtin
 
-  parsed = {}
-  for name, content of files
-    try
-      parsed[name] = syntax.parse content
-    catch e
-      e.file = name
-      throw e
+    asts = {}
+    for name, code of files
+      try
+        asts[name] = parse code
+      catch e
+        if e instanceof CompilerError
+          e.setFile name
+          e.addSource files[name]
+        throw e
 
-  result = {}
-  for name, ast of parsed
-    try
-      plugins ast, options.plugins
-      semantics ast, parsed, options.scope
-      result[name] = compiler ast
-    catch e
-      e.file = name
-      throw e
-
-  result
+    gs = new GlobalScope
+    compiled = {}
+    for name, ast of asts
+      try
+        plugins.run ast, options.plugins
+        assignScopes ast, gs
+        compiled[name] = compile ast
+      catch e
+        if e instanceof CompilerError
+          e.setFile name
+          e.addSource files[name]
+        throw e
+    compiled

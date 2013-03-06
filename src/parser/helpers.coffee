@@ -1,9 +1,5 @@
-_ = require 'underscore'
-
 module.exports =
-  every: (num, array) ->
-    return _.map array, (nested) ->
-      nested[num]
+  every: (num, arr) -> e[num] for e in arr
 
   filterProgram: (program) ->
     result = []
