@@ -1,5 +1,7 @@
 # SourceScript 2
 
+[![Build Status](https://travis-ci.org/Philipp15b/SourceScript.png?branch=master)](https://travis-ci.org/Philipp15b/SourceScript)
+
 SourceScript is a small and simple programming language that
 aims to simplifiy programming configurations for Valve's
 games based on the Source Engine.
