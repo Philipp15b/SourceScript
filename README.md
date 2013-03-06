@@ -36,7 +36,7 @@ files =
   'some/folder/autoexec.ss': 'echo "hello world"'
 options =
   plugins:
-    'uselesscomment': (cmd) ->
+    uselesscomment: (cmd) ->
        new nodes.Comment 'This comment is so useless'
 try
    out = SourceScript.compile files, options
