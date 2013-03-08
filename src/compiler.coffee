@@ -80,7 +80,7 @@ compile = (ast) ->
         unless first? then false
         else if first instanceof Command then first.args.length > 0
         else if first instanceof Assignment then true
-        else if first instanceof Variables then false
+        else if first instanceof Variable then false
 
       write "alias " + resolveVariable(parent, node.variable) + " "
       write '"' if quote
