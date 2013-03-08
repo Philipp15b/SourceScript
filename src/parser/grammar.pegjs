@@ -50,6 +50,7 @@ Statement
   / Assignment
   / &"$" v:Variable { return v; }
   / IfStatement
+  / CompilerCommand
   / Command
 
 Comment "Comment"
@@ -60,12 +61,12 @@ Comment "Comment"
 // Commands
 // ----------------------
 Command "Command"
-  = prefix:":"? name:Identifier args:(__ (CommandArgument _)*)?
-     { return new n.Command(name, args === "" ? [] : EVERY(0, args[1]), prefix === ":").p(line, column); }
+  = !":" name:Identifier args:(__ (StringLiteral _)*)?
+     { return new n.Command(name, args === "" ? [] : EVERY(0, args[1]), false).p(line, column); }
 
-CommandArgument
-  = Block
-  / StringLiteral
+CompilerCommand
+  = ":" name:Identifier args:(__ ((StringLiteral / Block) _)*)?
+     { return new n.Command(name, args === "" ? [] : EVERY(0, args[1]), true).p(line, column); }
 
 // ----------------------
 // Assignments
