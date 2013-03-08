@@ -75,8 +75,14 @@ compile = (ast) ->
       before = inline
       inline = yes
 
+      quote = node.value.statements.length isnt 1 or do ->
+        first = node.value.statements[0]
+        unless first? then false
+        else if first instanceof Command then first.args.length > 0
+        else if first instanceof Assignment then true
+        else if first instanceof Variables then false
+
       write "alias " + resolveVariable(parent, node.variable) + " "
-      quote = node.value.statements.length isnt 1 or node.value.statements[0]?.args.length > 0
       write '"' if quote
       @traverse node.value
       write '"' if quote
