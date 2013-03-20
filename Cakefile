@@ -52,8 +52,10 @@ task 'browserify', 'build with browserify', ->
   browserify = require 'browserify'
   UglifyJS = require 'uglify-js'
 
-  {bundle} = browserify './lib/browserify.js'
-  writeFileSync 'browser.js', bundle()
+  b = browserify './lib/browserify.js'
+  b.bundle (err, src) ->
+    throw err if err
+    writeFileSync 'browser.js', src
 
-  minified = UglifyJS.minify './browser.js'
-  writeFileSync './browser.min.js', minified.code
+    minified = UglifyJS.minify src, fromString: yes
+    writeFileSync './browser.min.js', minified.code
