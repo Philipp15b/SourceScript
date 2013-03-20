@@ -18,7 +18,7 @@
     "wrench": "~1.4.4"
   },
   "devDependencies": {
-    "coffee-script": "~1.5.0",
+    "coffee-script": "~1.6.2",
     "pegjs": "~0.7.0",
     "mkdirp": "~0.3.5",
     "mocha": "~1.8.1",
