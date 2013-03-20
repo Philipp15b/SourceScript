@@ -10,3 +10,10 @@ describe 'command', ->
       }
       """, ""
     , (err) -> err.name is "SyntaxError" and /but "{" found/.test err.message
+
+  it "should accept strings", ->
+    expectCompile """
+    command "hello world" test1 test2 "test3"
+    """, """
+    command "hello world" test1 test2 test3
+    """

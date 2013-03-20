@@ -21,7 +21,7 @@ describe "compiler command", ->
       expectCompile """
       :thisdoesnotexist
       """, ""
-    , SourceScript.CompilerError
+    , (err) -> err instanceof SourceScript.CompilerError and /Could not find/.test err.message
 
   describe "enum", ->
     it "should compile to aliases", ->

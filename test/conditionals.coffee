@@ -1,4 +1,6 @@
+assert = require 'assert'
 {expectCompile} = require './helpers'
+{CompilerError} = require '../'
 
 describe 'conditionals', ->
   it "should compile to aliases", ->
@@ -17,3 +19,12 @@ describe 'conditionals', ->
     alias FalseHook "bye; bye2"
     test
     """
+
+it "should fail when the variable is not defined", ->
+  assert.throws ->
+    expectCompile """
+    if $test {
+      something
+    }
+    """, ""
+  , (err) -> err instanceof CompilerError and /Variable .* is not declared/.test err.message
